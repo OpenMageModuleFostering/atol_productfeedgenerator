@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+
+<layout version="0.1.0">
+    <adminhtml_productflow_index>
+        <reference name="head">
+            <action method="addCss"><stylesheet>css/productfeedgenerator/styles.css</stylesheet></action>
+		</reference>
+        <reference name="content">
+            <block type="productfeedgenerator/adminhtml_productflow" name="productflow" />
+        </reference>
+    </adminhtml_productflow_index>
+
+	<adminhtml_productflow_edit>
+        <reference name="head">
+    		<action method="addJs"><script>colorbox/jquery.colorbox-min.js</script></action>
+    		<action method="addJs"><script>jquery/jquery-1.4.4.min.js</script></action>
+            <action method="addCss"><stylesheet>css/productfeedgenerator/styles.css</stylesheet></action>
+		</reference>
+    	<reference name="content">
+            <block type="productfeedgenerator/adminhtml_productflow_edit" name="productflow_edit" template="productflow/edit.phtml">
+                <block type="productfeedgenerator/adminhtml_productflow_edit_categories" name="productflow_categories" as="categories">
+                    <action method="setTemplate"><template>productflow/edit/categories.phtml</template></action>
+                </block>
+            </block>
+        </reference>
+    </adminhtml_productflow_edit>
+</layout>

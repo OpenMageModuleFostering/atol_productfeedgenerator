@@ -1,0 +1,387 @@
+<?php define("ORDERBY_COUNT",3); ?>
+
+<div id="product_flow_edit">   
+    <?php $model = Mage::registry('productflow_data'); ?>
+    <?php $json_data = (($model) ? Mage::helper('core')->jsonDecode($model->getData('json_data')) : null); ?>
+    <input type="hidden" id="productflow_id" name="productflow_id" value="<?php echo (($model) ? $model->getId() : ""); ?>" />
+    <?php $attributes = $this->getProductAttributes(); ?>
+    
+    <div id="messages">
+        <ul class="messages"></ul>
+    </div>
+    
+    <div class="content-header">
+        <h3 class="icon-head"><?php echo $this->__('Product flow edition'); ?></h3>
+        <p class="form-buttons">
+            <button class="scalable back" id="btn_back" type="button"><span><?php echo $this->__('Back'); ?></span></button>
+            <!--<button class="scalable" id="btn_test" type="button"><span><?php echo $this->__('Test'); ?></span></button>-->
+            <?php if($model) : ?>
+                <button class="scalable delete" id="btn_delete" type="button"><span><?php echo $this->__('Delete'); ?></span></button>
+            <?php endif; ?>
+            <button class="scalable save" id="btn_save" type="button"><span><?php echo $this->__('Save'); ?></span></button>
+        </p>
+    </div>
+    
+    <div class="entry-edit">
+        <div class="entry-edit-head">
+            <h4><?php echo $this->__('General informations'); ?></h4>
+        </div>
+        <fieldset>
+            <div class="input_section">
+                <label for="productflow_name"><?php echo $this->__('Name :'); ?></label>
+                <input id="productflow_name" type="text" value="<?php echo (($model) ? $model->getTitle() : "") ?>" />
+            </div>
+            <div class="input_section">
+                <label for="productflow_comment"><?php echo $this->__('Comment :'); ?></label>
+                <textarea id="productflow_comment"><?php echo (($model) ? $model->getNote() : "") ?></textarea>
+            </div>
+        </fieldset>
+    </div>    
+    
+    <div class="entry-edit">
+        <div class="entry-edit-head">
+            <h4><?php echo $this->__('Category filters'); ?></h4>
+        </div>
+        <fieldset>
+            <div class="input_section">    
+                <?php echo $this->getChildHtml('categories'); ?>
+            </div>
+        </fieldset>
+    </div>
+    
+    <?php 
+        $attributesList = Array();
+        if($json_data && $json_data['attributes']) {
+            foreach($json_data['attributes'] as $attribute) {
+                $attributesList[$attribute['id']] = array("operator" => $attribute['operator'], "values" => $attribute['values']);
+            }        
+        }
+
+    ?>
+    
+    <div class="entry-edit">
+        <div class="entry-edit-head">
+            <h4><?php echo $this->__('Attribute filters'); ?></h4>
+        </div>
+        <fieldset>
+            <div class="attributes_list input_section">
+                <div class="entry-edit-head">
+                    <h4><?php echo $this->__('Attribute list'); ?></h4>
+                </div>
+                <fieldset>
+                    <?php foreach($attributes as $attribute) : ?>
+                        <?php $frontendInput = $attribute->getData('frontend_input'); ?>
+                        <?php if(in_array($attribute->getData('frontend_input'), array('select', 'multiselect', 'boolean','text'))) : ?>
+                            <div class="attribute_item <?php echo $frontendInput; ?> <?php echo (isset($attributesList[$attribute->getData('attribute_id')]) ? 'filtered' : ''); ?>" <?php echo (isset($attributesList[$attribute->getData('attribute_id')]) ? '' : 'style="display:none;"'); ?> data-attribute-id="<?php echo $attribute->getData('attribute_id'); ?>" data-attribute-type="<?php echo $frontendInput; ?>">
+                                <label for="productflow_attribute[<?php echo $attribute->getData('attribute_id'); ?>]['operator']"><?php echo $attribute->getData('frontend_label'); ?></label>
+                                <select id="productflow_attribute[<?php echo $attribute->getData('attribute_id'); ?>]['operator']" class="operator">
+                                    <?php foreach($this->getOperators($frontendInput) as $operator => $label): ?>
+                                        <option value="<?php echo $operator; ?>" <?php echo ((isset($attributesList[$attribute->getData('attribute_id')]) && $attributesList[$attribute->getData('attribute_id')]['operator'] === $operator) ? 'selected="selected"' : ''); ?>><?php echo $label; ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                                
+                                <?php if($frontendInput === 'multiselect') : ?>
+                                    <select id="productflow_attribute[<?php echo $attribute->getData('attribute_id'); ?>]['value']" class="value" multiple="multiple">
+                                        <?php foreach($attribute->getSource()->getAllOptions(true, true) as $option) : ?>
+                                            <?php if($option['value'] != "" && $option['value'] != null) : ?>
+                                                <option value="<?php echo $option['value']; ?>" <?php echo ((isset($attributesList[$attribute->getData('attribute_id')]) && in_array($option['value'], $attributesList[$attribute->getData('attribute_id')]['values'])) ? 'selected="selected"' : ''); ?>><?php echo $option['label'] ?></option>
+                                            <?php endif; ?>
+                                        <?php endforeach; ?>
+                                    </select>
+                                <?php elseif($frontendInput === 'select') : ?>
+                                    <select id="productflow_attribute[<?php echo $attribute->getData('attribute_id'); ?>]['value']" class="value" <?php echo (isset($attributesList[$attribute->getData('attribute_id')]) && $attributesList[$attribute->getData('attribute_id')]['operator'] === 'or') ? 'multiple=""' : ''; ?>>
+                                        <?php foreach($attribute->getSource()->getAllOptions(true, true) as $option) : ?>
+                                            <?php if($option['value'] != "" && $option['value'] != null) : ?>
+                                                <option value="<?php echo $option['value']; ?>" <?php echo ((isset($attributesList[$attribute->getData('attribute_id')]) && in_array($option['value'], $attributesList[$attribute->getData('attribute_id')]['values'])) ? 'selected="selected"' : ''); ?>><?php echo $option['label'] ?></option>
+                                            <?php endif; ?>
+                                        <?php endforeach; ?>
+                                    </select>
+                                <?php elseif($frontendInput === 'boolean') : ?>
+                                    <select id="productflow_attribute[<?php echo $attribute->getData('attribute_id'); ?>]['value']" name="productflow['attributes']" class="value" >
+                                        <option value="true" <?php echo ((isset($attributesList[$attribute->getData('attribute_id')]) && in_array(true, $attributesList[$attribute->getData('attribute_id')]['values'])) ? 'selected="selected"' : ''); ?>><?php echo $this->__('yes'); ?></option>
+                                        <option value="false" <?php echo ((isset($attributesList[$attribute->getData('attribute_id')]) && in_array(false, $attributesList[$attribute->getData('attribute_id')]['values'])) ? 'selected="selected"' : ''); ?>><?php echo $this->__('no'); ?></option>
+                                    </select>
+                                <?php elseif($frontendInput === 'text') : ?>
+                                    <input type="text" id="productflow_attribute[<?php echo $attribute->getData('attribute_id'); ?>]['value']" name="productflow['attributes']" class="value" style="width:50%" value="<?php echo $attributesList[$attribute->getData('attribute_id')]['values'][0] ?>"/>
+                                <?php endif; ?>
+                                <button class="btn_drop_attribute" data-attribute-id="<?php echo $attribute->getData('attribute_id'); ?>" ><?php echo $this->__('Drop'); ?></button>
+                            </div>
+                        <?php endif; ?>
+                    <?php endforeach; ?>
+                </fieldset>
+                <div id="add_attribute">
+                    <label for="add_attribute_select"><?php echo $this->__('Add an attribute to filter'); ?></label>
+                    <select id="add_attribute_select">
+                        <?php foreach($attributes as $attribute) : ?>
+                            <option value="<?php echo $attribute->getData('attribute_id'); ?>" class="<?php echo (isset($attributesList[$attribute->getData('attribute_id')]) ? 'filtered' : ''); ?>" ><?php echo $attribute->getData('attribute_code'); ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                    <button class="btn_add_attribute"><?php echo $this->__('Add'); ?></button>
+                </div>
+            </div> 
+        </fieldset>
+    </div>
+    
+    <div class="entry-edit">
+        <div class="entry-edit-head">
+            <h4><?php echo $this->__('Other filters'); ?></h4>
+        </div>
+        <fieldset>
+            <div id="product_filters" class="input_section">
+                <div class="product_filter">
+                    <input type="checkbox" id="discounted_products" name="productflow['filters']['discounted']" <?php echo ((isset($json_data) && isset($json_data['filters']) && isset($json_data['filters']['discounted']) && $json_data['filters']['discounted']) ? 'checked="checked"' : ''); ?> />
+                    <label for="discounted_products"><?php echo $this->__('Filter only discounted products ?'); ?></label>
+                </div>
+                <div class="product_filter">
+                    <input type="checkbox" id="new_products" name="productflow['filters']['new']" <?php echo ((isset($json_data) && isset($json_data['filters']) && isset($json_data['filters']['new']) && $json_data['filters']['new']) ? 'checked="checked"' : ''); ?>/>
+                    <label for="new_products"><?php echo $this->__('Filter only new products ?'); ?></label>
+                </div>
+            </div>
+        </fieldset>
+    </div>
+    
+    <div class="entry-edit">
+        <div class="entry-edit-head">
+            <h4><?php echo $this->__('Collection management'); ?></h4>
+        </div>
+        <fieldset>
+            <!--<div class="input_section">
+                <label for="productflow_order_by"><?php echo $this->__('Order by :'); ?></label>
+                <select id="productflow_order_by">
+                    <?php foreach($attributes as $attribute) : ?>
+                        <option value="<?php echo $attribute->getData('attribute_id'); ?>"><?php echo $attribute->getData('frontend_label'); ?></option>
+                    <?php endforeach; ?>
+                </select>
+                <select id="productflow_order_direction">
+                    <option value="asc"><?php echo $this->__('ASC'); ?></option>
+                    <option value="desc"><?php echo $this->__('DESC'); ?></option>
+                </select>
+            </div>-->
+            <div class="input_section">
+                <label for="productflow_limit"><?php echo $this->__('Limit :'); ?></label>
+                <input id="productflow_limit" name="productflow['limit']" type="text" value="<?php echo ((isset($json_data) && isset($json_data['others']) && isset($json_data['others']['limit']) && $json_data['others']['limit']) ? $json_data['others']['limit'] : ''); ?>" />
+            </div>
+            
+            <?php $orderByOptions = Mage::getModel('productfeedgenerator/system_config_source_orderbytype')->toOptionArray(); ?>
+            
+            <?php foreach(range(0,ORDERBY_COUNT - 1) as $i) : ?>
+                <?php $currentOrderBy = ($json_data && isset($json_data['orderBy']) && isset($json_data['orderBy'][$i]) && isset($json_data['orderBy'][$i]) && isset($json_data['orderBy'][$i]['attribute']) && isset($json_data['orderBy'][$i]['direction'])) ? $json_data['orderBy'][$i] : null; ?>
+                <div class="input_section">
+                    <label for="orderby<?php echo $i; ?>"><?php echo $this->__('Order %s :', $i); ?></label>
+                    <select name="orderby['<?php echo $i; ?>']" id="orderby<?php echo $i; ?>" class="orderby" data-orderbyid="<?php echo $i; ?>">
+                        <?php foreach($orderByOptions as $orderBy) : ?>
+                            <option value="<?php echo $orderBy['value']; ?>" <?php echo ($currentOrderBy && $currentOrderBy['attribute'] == $orderBy['value']) ? 'selected="selected"' :'' ?>><?php echo $orderBy['label']; ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                    <select name="direction['<?php echo $i; ?>']" id="direction<?php echo $i; ?>" class="direction">
+                        <option value="asc" <?php echo ($currentOrderBy && $currentOrderBy['direction'] == "asc") ? 'selected="selected"' :'' ?>><?php echo $this->__('asc'); ?></option>  
+                        <option value="desc" <?php echo ($currentOrderBy && $currentOrderBy['direction'] == "desc") ? 'selected="selected"' :'' ?>><?php echo $this->__('desc'); ?></option>  
+                    </select>
+                </div>
+            <?php endforeach; ?>
+        </fieldset>
+    </div>
+    
+    <script type="text/javascript">
+        function formToJson() {
+            var limitValue = parseInt(jQuery('#productflow_limit').val());
+            if(isNaN(limitValue)) {
+                limitValue = null;
+            }
+            
+            var json = {
+                "attributes" : jQuery('.attribute_item.filtered').map(function() { 
+                    var attributeType = jQuery(this).attr('data-attribute-type');
+                    return {
+                        "id" : jQuery(this).attr('data-attribute-id'), 
+                        "operator" : jQuery(this).children('select.operator').val(),
+                        "values" : jQuery(this).find('select.value option:selected, :text').map(function() {
+                            return (attributeType == 'boolean') ? (jQuery(this).val() == "true") : jQuery(this).val();
+                        }).get()
+                    };
+                }).get(),
+                "categories" : jQuery('#productflow_categories').val().split(',').map( function(categoryId, i) { 
+                    return (isNaN(parseInt(categoryId))) ? null : parseInt(categoryId);
+                }),
+                "filters" : 
+                {
+                    "discounted" : jQuery('#discounted_products').is(':checked'),
+                    "new" : jQuery('#new_products').is(':checked')
+                },
+                "orderBy" : jQuery('.orderby').map(function() {
+                    var currentSelect = jQuery(this);
+                    return {
+                        "attribute" : currentSelect.val(),
+                        "direction" : currentSelect.siblings('.direction').val()
+                    };
+                }).get(),
+                "others" : 
+                {
+                    "limit" : limitValue
+                }
+            };
+            
+            return json;
+        }
+    
+        jQuery(document).ready(function () {  
+            var optionSelected = jQuery('#add_attribute_select option:selected');
+            if(optionSelected.length > 0) {
+                optionSelected.hide();
+                jQuery('#add_attribute_select option:not(.filtered):first').attr("selected","selected");
+            }
+        
+            jQuery('.btn_add_attribute').click(function() {
+                var optionSelected = jQuery('#add_attribute_select option:selected');
+                var id = optionSelected.val();
+                var attribute = jQuery('.attribute_item[data-attribute-id='+id+']');
+                attribute.show();
+                attribute.addClass('filtered');
+                optionSelected.hide();
+                optionSelected.addClass('filtered');
+                jQuery('#add_attribute_select option:not(.filtered):first').attr("selected","selected");
+            });
+            
+            jQuery('.btn_drop_attribute').click(function() {
+                var id = jQuery(this).attr('data-attribute-id');
+                var attribute = jQuery('div.attribute_item[data-attribute-id='+id+']');
+                attribute.hide();
+                attribute.removeClass('filtered');
+                var option = jQuery('#add_attribute_select option[value="'+id+'"]');
+                option.show();
+                option.removeClass('filtered');
+            });
+            
+            jQuery('.btn_drop_category').click(function() {
+                var parent = jQuery(this).parent();
+                parent.hide();
+                parent.removeClass('filtered');
+            });
+            
+            jQuery('.attribute_item.select select.operator').change( function() {
+                var operator = jQuery(this);
+                if(operator.parent().hasClass('filtered') && operator.val() == 'or') {
+                    operator.siblings('select.value').attr('multiple','multiple');
+                } else {
+                    operator.siblings('select.value').removeAttr('multiple');
+                }
+            });
+            
+            /*jQuery('#btn_test, #btn_test span').live('click', function() {
+                var flow = formToJson();
+                
+                jQuery.ajax({
+                    type : "POST",
+                    url : "<?php echo Mage::getUrl('adminhtml/productflow/test'); ?>",
+                    data : { 
+                        "data" : Object.toJSON(flow),
+                        "form_key" : FORM_KEY
+                    },
+                    dataType : "json",
+                    success : function(data) {
+                        jQuery('#messages .messages').html('<li class="info-msg">' + data.count + ' <?php echo $this->__('products given by the current query') ?></li>');
+                    },
+                    error : function(data) {
+                        jQuery('#messages .messages').html('<li class="error-msg"><?php echo $this->__('Server error'); ?></li>');
+                    }
+                });
+            });*/
+            
+            jQuery('#btn_save, #btn_save span').live('click', function() {
+                var flow = formToJson();
+                
+                jQuery.ajax({
+                    type : "POST",
+                    url : "<?php echo Mage::getUrl('adminhtml/productflow/save'); ?>",
+                    data : { 
+                        "id" : jQuery('#productflow_id').val(),
+                        "name" : jQuery('#productflow_name').val(),
+                        "comment" : jQuery('#productflow_comment').val(),
+                        "data" : Object.toJSON(flow),
+                        "form_key" : FORM_KEY
+                    },
+                    dataType : "json",
+                    success : function(data) {
+                        if(data != null) {
+                            if('error' in data) {
+                                jQuery('#messages .messages').html('<li class="error-msg">' + data.error + '</li>');
+                            } else if('success' in data) {
+                                window.location = "<?php echo Mage::helper("adminhtml")->getUrl('adminhtml/productflow/index'); ?>";
+                            } else {
+                                jQuery('#messages .messages').html('<li class="error-msg"><?php echo $this->__('Server error'); ?></li>');
+                            }                            
+                        } 
+                    },
+                    error : function(data) {
+                        if(data != null && 'error' in data) {
+                            jQuery('#messages .messages').html('<li class="error-msg">' + data.error + '</li>');
+                        } else {
+                            jQuery('#messages .messages').html('<li class="error-msg"><?php echo $this->__('Server error'); ?></li>');
+                        }
+                    }
+                });
+                
+            });
+            
+            jQuery('#btn_delete, #btn_delete span').live('click', function() {
+                var flow = formToJson();
+                
+                jQuery.ajax({
+                    type : "POST",
+                    url : "<?php echo Mage::getUrl('adminhtml/productflow/delete'); ?>",
+                    data : { 
+                        "id" : jQuery('#productflow_id').val(),
+                        "form_key" : FORM_KEY
+                    },
+                    dataType : "json",
+                    success : function(data) {
+                        if(data != null) {
+                            if('error' in data) {
+                                jQuery('#messages .messages').html('<li class="error-msg">' + data.error + '</li>');
+                            } else if('success' in data) {
+                                window.location = "<?php echo Mage::helper("adminhtml")->getUrl('adminhtml/productflow/index'); ?>";
+                            } else {
+                                jQuery('#messages .messages').html('<li class="error-msg"><?php echo $this->__('Server error'); ?></li>');
+                            }                            
+                        } 
+                    },
+                    error : function(data) {
+                        if(data != null && 'error' in data) {
+                            jQuery('#messages .messages').html('<li class="error-msg">' + data.error + '</li>');
+                        } else {
+                            jQuery('#messages .messages').html('<li class="error-msg"><?php echo $this->__('Server error'); ?></li>');
+                        }
+                    }
+                });                
+            });
+            
+            jQuery('#btn_back').live('click', function() {
+                setLocation('<?php echo Mage::helper("adminhtml")->getUrl('adminhtml/productflow/index'); ?>');
+            });
+            
+            jQuery('.orderby').change(function() {
+                var currentSelect = jQuery(this);
+                var id = parseInt(currentSelect.attr('data-orderbyid'));
+                if(currentSelect.val() == 0) {   
+                    var others = jQuery('.orderby').filter(function() {   
+                        return jQuery(this).attr("data-orderbyid") > id; 
+                    });
+                    others.val(0);
+                    others.parent().hide();
+                } else {
+                    jQuery('.orderby[data-orderbyid="'+(id+1)+'"]').parent().show();
+                }
+            });
+            
+            var firstToNull = jQuery('.orderby option[value="0"]:selected:first').parent();
+            firstToNull.parent().show();
+            var idFirst = parseInt(firstToNull.attr('data-orderbyid'));
+            var others = jQuery('.orderby').filter(function() {   
+                return jQuery(this).attr("data-orderbyid") > idFirst; 
+            });
+            others.val(0);
+            others.parent().hide();
+            
+        });
+    </script>
+</div>
