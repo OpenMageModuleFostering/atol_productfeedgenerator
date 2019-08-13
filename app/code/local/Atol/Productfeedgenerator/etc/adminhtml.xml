@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<config>
+    <menu>
+        <catalog>
+            <children>
+                <productflow module="productfeedgenerator">
+                    <title>Product flow</title>
+                    <sort_order>10</sort_order>
+                    <action>adminhtml/productflow</action>
+                </productflow>
+            </children>
+         </catalog>
+    </menu>    
+    <layout>
+        <updates>
+            <productfeedgenerator>
+                <file>productfeedgenerator.xml</file>
+            </productfeedgenerator>
+        </updates>
+    </layout>
+    <acl>
+        <resources>
+            <admin translate="title" module="productfeedgenerator">
+                <children>
+                    <catalog>
+                        <children>
+                            <productflow module="productfeedgenerator">
+                                <title>Product flow</title>
+                            </productflow>
+                        </children>
+                    </catalog>
+                </children>
+            </admin>
+        </resources>
+    </acl>
+</config>

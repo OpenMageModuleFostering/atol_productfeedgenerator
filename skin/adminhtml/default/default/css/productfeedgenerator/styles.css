@@ -1,0 +1,50 @@
+.entry-edit fieldset .input_section {
+    display: block;
+    margin-bottom: 10px;
+    margin-top: 10px;
+}
+
+.entry-edit fieldset .input_section label {    
+    display: inline-block;
+    position:relative\9;
+    zoom:1\9;
+    width: 200px;
+}
+
+.entry-edit fieldset .input_section select, .entry-edit fieldset .input_section input[type="text"], .entry-edit fieldset .input_section textarea {    
+    width: 250px;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.entry-edit fieldset .input_section input[type="radio"], .entry-edit fieldset .input_section input[type="checkbox"] {
+    margin: 5px;
+}
+
+.entry-edit fieldset .input_section #productflow_order_direction, .entry-edit fieldset .input_section .attribute_item.filtered .value  {
+    width: 100px;
+    margin-left: 20px;
+}
+
+.entry-edit fieldset .input_section button {
+    margin-left: 20px;
+}
+
+.entry-edit fieldset .input_section .attribute_item.filtered {
+    margin-bottom: 10px;
+    margin-top: 10px;
+}
+
+.entry-edit fieldset .input_section select.direction {    
+    margin-left: 10px;
+    width: 150px;
+}
+
+#productfeedgeneratorGrid_table a.rss_link {
+    background-image: url("../../../../../frontend/default/default/images/i_rss-big.png");
+    display: block;
+    height: 20px;
+    width: 20px;
+}

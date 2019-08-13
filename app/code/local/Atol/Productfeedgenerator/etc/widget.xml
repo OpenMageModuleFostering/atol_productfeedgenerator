@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<widgets>
+    <frontdisplay type="productfeedgenerator/frontdisplay">
+        <name>Flux de Produits</name>
+        <description type="desc">Flux de produits configurable</description>
+        <parameters>
+            <flux_id>
+                <label>Link Options</label>
+                <visible>1</visible>
+                <required>1</required>
+                <type>select</type>
+                <source_model>productfeedgenerator/system_config_source_productflowtype</source_model>
+            </flux_id>
+            <columns>
+                <required>0</required>
+                <visible>1</visible>
+                <label>Nombre de colonnes</label>
+                <type>select</type>
+                <values>
+                    <list translate="label">
+                        <value>3</value>
+                        <label>3</label>
+                    </list>
+                    <list translate="label">
+                        <value>4</value>
+                        <label>4</label>
+                    </list>
+                    <default translate="label">
+                        <value>5</value>
+                        <label>5</label>
+                    </default>
+                </values>
+            </columns>
+        </parameters>
+    </frontdisplay>
+</widgets>
