@@ -71,7 +71,7 @@
                 <fieldset>
                     <?php foreach($attributes as $attribute) : ?>
                         <?php $frontendInput = $attribute->getData('frontend_input'); ?>
-                        <?php if(in_array($attribute->getData('frontend_input'), array('select', 'multiselect', 'boolean','text'))) : ?>
+                        <?php if(in_array($attribute->getData('frontend_input'), array('select', 'multiselect', 'boolean'))) : ?>
                             <div class="attribute_item <?php echo $frontendInput; ?> <?php echo (isset($attributesList[$attribute->getData('attribute_id')]) ? 'filtered' : ''); ?>" <?php echo (isset($attributesList[$attribute->getData('attribute_id')]) ? '' : 'style="display:none;"'); ?> data-attribute-id="<?php echo $attribute->getData('attribute_id'); ?>" data-attribute-type="<?php echo $frontendInput; ?>">
                                 <label for="productflow_attribute[<?php echo $attribute->getData('attribute_id'); ?>]['operator']"><?php echo $attribute->getData('frontend_label'); ?></label>
                                 <select id="productflow_attribute[<?php echo $attribute->getData('attribute_id'); ?>]['operator']" class="operator">
@@ -101,8 +101,6 @@
                                         <option value="true" <?php echo ((isset($attributesList[$attribute->getData('attribute_id')]) && in_array(true, $attributesList[$attribute->getData('attribute_id')]['values'])) ? 'selected="selected"' : ''); ?>><?php echo $this->__('yes'); ?></option>
                                         <option value="false" <?php echo ((isset($attributesList[$attribute->getData('attribute_id')]) && in_array(false, $attributesList[$attribute->getData('attribute_id')]['values'])) ? 'selected="selected"' : ''); ?>><?php echo $this->__('no'); ?></option>
                                     </select>
-                                <?php elseif($frontendInput === 'text') : ?>
-                                    <input type="text" id="productflow_attribute[<?php echo $attribute->getData('attribute_id'); ?>]['value']" name="productflow['attributes']" class="value" style="width:50%" value="<?php echo $attributesList[$attribute->getData('attribute_id')]['values'][0] ?>"/>
                                 <?php endif; ?>
                                 <button class="btn_drop_attribute" data-attribute-id="<?php echo $attribute->getData('attribute_id'); ?>" ><?php echo $this->__('Drop'); ?></button>
                             </div>
@@ -113,7 +111,7 @@
                     <label for="add_attribute_select"><?php echo $this->__('Add an attribute to filter'); ?></label>
                     <select id="add_attribute_select">
                         <?php foreach($attributes as $attribute) : ?>
-                            <option value="<?php echo $attribute->getData('attribute_id'); ?>" class="<?php echo (isset($attributesList[$attribute->getData('attribute_id')]) ? 'filtered' : ''); ?>" ><?php echo $attribute->getData('attribute_code'); ?></option>
+                            <option value="<?php echo $attribute->getData('attribute_id'); ?>" class="<?php echo (isset($attributesList[$attribute->getData('attribute_id')]) ? 'filtered' : ''); ?>" ><?php echo $attribute->getData('frontend_label'); ?></option>
                         <?php endforeach; ?>
                     </select>
                     <button class="btn_add_attribute"><?php echo $this->__('Add'); ?></button>
@@ -194,8 +192,8 @@
                     var attributeType = jQuery(this).attr('data-attribute-type');
                     return {
                         "id" : jQuery(this).attr('data-attribute-id'), 
-                        "operator" : jQuery(this).children('select.operator').val(),
-                        "values" : jQuery(this).find('select.value option:selected, :text').map(function() {
+                        "operator" : jQuery(this).children('select.operator').val(), 
+                        "values" : jQuery(this).find('select.value option:selected').map(function() {     
                             return (attributeType == 'boolean') ? (jQuery(this).val() == "true") : jQuery(this).val();
                         }).get()
                     };
@@ -266,26 +264,6 @@
                     operator.siblings('select.value').removeAttr('multiple');
                 }
             });
-            
-            /*jQuery('#btn_test, #btn_test span').live('click', function() {
-                var flow = formToJson();
-                
-                jQuery.ajax({
-                    type : "POST",
-                    url : "<?php echo Mage::getUrl('adminhtml/productflow/test'); ?>",
-                    data : { 
-                        "data" : Object.toJSON(flow),
-                        "form_key" : FORM_KEY
-                    },
-                    dataType : "json",
-                    success : function(data) {
-                        jQuery('#messages .messages').html('<li class="info-msg">' + data.count + ' <?php echo $this->__('products given by the current query') ?></li>');
-                    },
-                    error : function(data) {
-                        jQuery('#messages .messages').html('<li class="error-msg"><?php echo $this->__('Server error'); ?></li>');
-                    }
-                });
-            });*/
             
             jQuery('#btn_save, #btn_save span').live('click', function() {
                 var flow = formToJson();

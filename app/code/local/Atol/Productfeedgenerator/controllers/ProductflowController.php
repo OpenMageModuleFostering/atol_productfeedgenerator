@@ -6,7 +6,7 @@
  */
 
 class Atol_Productfeedgenerator_ProductflowController extends Mage_Core_Controller_Front_Action {
-    
+
     protected function isFeedEnable()
     {
         return Mage::getStoreConfig('rss/productfeedgenerator/active');
@@ -21,12 +21,12 @@ class Atol_Productfeedgenerator_ProductflowController extends Mage_Core_Controll
             return $this->getResponse()->setHeader('HTTP/1.1','403 Forbidden');
         }
     }
-    
+
     public function rssAction() {
         $productFlowId = (int) $this->getRequest()->getParam('id',false);
         if($productFlowId) {
             $productFlow = Mage::getModel('productfeedgenerator/productflow')->load($productFlowId);
-            
+
             if($productFlow && $productFlow->getData('flow_id') && !$productFlow->getData('deleted_at')) {
                 Mage::register('product_flow', $productFlow);
                 $this->checkFeedEnable();

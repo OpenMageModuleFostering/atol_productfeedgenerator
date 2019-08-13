@@ -14,13 +14,16 @@ class Atol_Productfeedgenerator_Adminhtml_ProductflowController extends Mage_Adm
 
         return $this;
     }
-    
-    public function indexAction() { 
+
+    public function indexAction() {
+        if(Mage::getStoreConfig('rss/active') != 1) {
+            Mage::getSingleton('adminhtml/session')->addWarning('Please enable rss in System/Configuration/Catalog/RSS Feeds');
+        }
         $this->_initAction()
             ->renderLayout();
     }
-    
-    public function editAction() {    
+
+    public function editAction() {
         $id = $this->getRequest()->getParam('id', null);
         $model = Mage::getModel('productfeedgenerator/productflow');
         if ($id) {
@@ -31,16 +34,16 @@ class Atol_Productfeedgenerator_Adminhtml_ProductflowController extends Mage_Adm
             }
         }
         Mage::register('productflow_data', $model);
- 
+
         $this->loadLayout();
         $this->getLayout()->getBlock('head')->setCanLoadExtJs(true);
         $this->renderLayout();
     }
-    
+
     public function newAction() {
         $this->_forward('edit');
     }
-    
+
     public function saveAction() {
         if ($this->getRequest()->isPost() && $this->getRequest()->isXmlHttpRequest()) {
             $request = $this->getRequest();
@@ -48,29 +51,29 @@ class Atol_Productfeedgenerator_Adminhtml_ProductflowController extends Mage_Adm
             $name = Mage::helper('core')->escapeHtml($request->getPost('name'));
             $comment = Mage::helper('core')->escapeHtml($request->getPost('comment'));
             $data = Mage::helper('core')->jsonDecode($request->getPost('data'));
-            
-            
-            if($name && $data && isset($data['attributes']) && isset($data['categories']) && isset($data['filters']) && isset($data['others'])) {            
-                try {          
-                    $now = date('Y-M-d H:i:s');          
+
+
+            if($name && $data && isset($data['attributes']) && isset($data['categories']) && isset($data['filters']) && isset($data['others'])) {
+                try {
+                    $now = date('Y-M-d H:i:s');
                     $productFlow = Mage::getModel('productfeedgenerator/productflow');
                     if($id) {
                         $productFlow = $productFlow->load($id);
                     } else {
                         $productFlow->setData('created_at', $now);
-                    }                    
+                    }
                     $productFlow->setData('title', $name);
                     $productFlow->setData('note', $comment);
                     $productFlow->setData('json_data', $request->getPost('data'));
                     $productFlow->setData('updated_at', $now);
-                    
-                    $productFlow->save();                                   
-                    
+
+                    $productFlow->save();
+
                     Mage::getSingleton('adminhtml/session')->addSuccess(Mage::helper('productfeedgenerator')->__('The product flow was successfully updated'));
                     return $this->getResponse()->setBody(Mage::helper('core')->jsonEncode(array("success" => Mage::helper('productfeedgenerator')->__('The product flow was successfully updated'))));
-                } catch(Exception $e) {                    
-                    return $this->getResponse()->setBody(Mage::helper('core')->jsonEncode(array("error" => $e->getMessage())));    
-                }                
+                } catch(Exception $e) {
+                    return $this->getResponse()->setBody(Mage::helper('core')->jsonEncode(array("error" => $e->getMessage())));
+                }
             } else {
                 return $this->getResponse()->setBody(Mage::helper('core')->jsonEncode(array("error" => Mage::helper('productfeedgenerator')->__('Invalid data'))));
             }
@@ -78,20 +81,20 @@ class Atol_Productfeedgenerator_Adminhtml_ProductflowController extends Mage_Adm
             return $this->getResponse()->setHeader('HTTP/1.1','404 Not Found');
         }
     }
-    
+
     public function deleteAction() {
         if ($this->getRequest()->isPost() && $this->getRequest()->isXmlHttpRequest()) {
             $id = $this->getRequest()->getPost('id');
             if( $id > 0 ) {
                 try {
                     $productFlow = Mage::getModel('productfeedgenerator/productflow')->load($id);
-                    
+
                     $now = date('Y-M-d H:i:s');
                     $productFlow->setData('deleted_at', $now);
                     $productFlow->setData('updated_at', $now);
-                    
+
                     $productFlow->save();
-                    
+
                     Mage::getSingleton('adminhtml/session')->addSuccess(Mage::helper('productfeedgenerator')->__('The product flow was successfully deleted'));
                     return $this->getResponse()->setBody(Mage::helper('core')->jsonEncode(array("success" => Mage::helper('productfeedgenerator')->__('The product flow was successfully deleted'))));
                 } catch(Exception $e) {
@@ -104,13 +107,13 @@ class Atol_Productfeedgenerator_Adminhtml_ProductflowController extends Mage_Adm
             return $this->getResponse()->setHeader('HTTP/1.1','404 Not Found');
         }
     }
-    
+
     public function testAction() {
         if ($this->getRequest()->isPost() && $this->getRequest()->isXmlHttpRequest()) {
             $request = $this->getRequest();
             $collection = Mage::helper('productfeedgenerator')->getProductCollectionFromJson($request->getPost('data'));
-            
-            if($collection) {    
+
+            if($collection) {
                 return $this->getResponse()->setBody(Mage::helper('core')->jsonEncode(array('count' => $collection->count())));
             } else {
                 return $this->getResponse()->setBody(Mage::helper('core')->jsonEncode(array('error' => Mage::helper('productfeedgenerator')->__('Invalid data'))));
@@ -119,7 +122,7 @@ class Atol_Productfeedgenerator_Adminhtml_ProductflowController extends Mage_Adm
             return $this->getResponse()->setHeader('HTTP/1.1','404 Not Found');
         }
     }
-    
+
     /**
      * Initialize requested category and put it into registry.
      * Root category can be returned, if inappropriate store/category is specified
@@ -164,12 +167,12 @@ class Atol_Productfeedgenerator_Adminhtml_ProductflowController extends Mage_Adm
         Mage::getSingleton('cms/wysiwyg_config')->setStoreId($this->getRequest()->getParam('store'));
         return $category;
     }
-    
+
     /**
      * Get tree node (Ajax version)
      */
     public function categoriesJsonAction()
-    {    
+    {
         $productFlowId = (int) $this->getRequest()->getPost('productflow',false);
         if($productFlowId) {
             $productFlow = Mage::getModel('productfeedgenerator/productflow')->load($productFlowId);

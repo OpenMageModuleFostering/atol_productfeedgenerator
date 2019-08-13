@@ -1,0 +1,85 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Magento
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Academic Free License (AFL 3.0)
+ * that is bundled with this package in the file LICENSE_AFL.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/afl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@magentocommerce.com so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magento to newer
+ * versions in the future. If you wish to customize Magento for your
+ * needs please refer to http://www.magentocommerce.com for more information.
+ *
+ * @category    design
+ * @package     base_default
+ * @copyright   Copyright (c) 2011 Magento Inc. (http://www.magentocommerce.com)
+ * @license     http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ */
+-->
+<layout version="0.1.0">
+    <default>
+        <block type="rss/list" name="head_rss" ifconfig="rss/config/active" />
+    </default>
+    <productfeedgenerator_index_index>
+        <!-- Set title -->
+        <reference name="head">
+            <action method="setTitle">
+                <title>PFG Productlist</title>
+            </action>
+        </reference>
+        <reference name="root">
+            <action method="setTemplate">
+                <template>page/1column.phtml</template>
+            </action>
+        </reference>
+        <reference name="content">
+            <!-- Add product list to content -->
+            <block type="catalog/product_list" name="product_list" template="catalog/product/list.phtml">
+                <!-- Add toolbar to product list -->
+                <block type="catalog/product_list_toolbar" name="product_list_toolbar" template="catalog/product/list/toolbar.phtml">
+                    <!-- Add pager to toolbar -->
+                    <block type="page/html_pager" name="product_list_toolbar_pager"/>
+                </block>
+
+                <!-- Specify toolbar block name -->
+                <action method="setToolbarBlockName">
+                    <name>product_list_toolbar</name>
+                </action>
+
+                <!-- Use custom product collection -->
+                <action method="setCollection">
+                    <value helper="productfeedgenerator/getProductCollectionFromId"/>
+                </action>
+
+                <!-- Set the default sort by order -->
+                <action method="setSortBy">
+                    <value>price</value>
+                </action>
+
+                <!-- Set default direction to ascending -->
+                <action method="setDefaultDirection">
+                    <value>asc</value>
+                </action>
+
+                <action method="setColumnCount">
+                    <coulumn>5</coulumn>
+                </action>
+            </block>
+        </reference>
+    </productfeedgenerator_index_index>
+
+    <productfeedgenerator_productflow_rss>
+        <block type="productfeedgenerator/productflow_rss" output="toHtml" name="productfeedgenerator.productflow.rss">
+            <action method="addPriceBlockType"><type>msrp_rss</type><block>catalog/product_price</block><template>catalog/product/price_msrp_rss.phtml</template></action>
+        </block>
+    </productfeedgenerator_productflow_rss>
+</layout>

@@ -9,9 +9,13 @@ class Atol_Productfeedgenerator_Block_Frontdisplay
         $columns = self::getData('columns');
 
         $template = 'catalog/product/list.phtml';
-        /* Pour ne pas avoir le bug des puces apparantes dans la liste de produits, ajouter le code suivant dans Page/Design/Page Layout/Layout Update XML
-         * <reference name="content"><remove name="cms.wrapper" /><block type="core/template" name="home-content"
-         *  template="test.phtml" /><block type="cms/page" name="cms_page"/></reference>
+        /*
+        To avoid displaying the list marker on product list widget, add the following code to CMS_page/Design/Page Layout/Layout Update XML
+        Pour ne pas avoir le bug des puces apparantes dans la liste de produits, ajouter le code suivant dans Page/Design/Page Layout/Layout Update XML
+        <reference name="content">
+            <remove name="cms.wrapper" />
+            <block type="cms/page" name="cms_page"/>
+        </reference>
          */
 
         $this->setColumnCount($columns);

@@ -14,9 +14,7 @@ class Atol_Productfeedgenerator_Block_Adminhtml_Productflow_Edit extends Mage_Ad
         $this->operators = array(
             "multiselect" => array('one' => $this->__('at least one of them operator'), 'all' => $this->__('all of them operator')),
             "select" => array('eq' => $this->__('equal operator'), 'neq' => $this->__('not equal operator'), 'or' => $this->__('or operator')), 
-            "boolean" => array('eq' => $this->__('equal operator'), 'neq' => $this->__('not equal operator')),
-            "text" => array('eq' => $this->__('equal operator'), 'neq' => $this->__('not equal operator'), 'in' => $this->__('in operator'))
-
+            "boolean" => array('eq' => $this->__('equal operator'), 'neq' => $this->__('not equal operator'))
         );
     }
     
