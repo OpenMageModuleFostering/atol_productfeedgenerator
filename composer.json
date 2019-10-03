@@ -1,16 +1,19 @@
 {
-    "name": "OpenMageModuleFostering/Atol_Productfeedgenerator",
+    "name": "OpenMageModuleFostering\/Atol_Productfeedgenerator",
     "type": "magento-module",
     "license": "GNU-General-Public-License-(GPL)",
     "homepage": "",
     "description": "Create custom product collections and display them through a widget or create a rss feed.",
     "authors": [
-    {
-        "name": "AtolCD",
-        "email": "magento@atolcd.com"
-    }
-],
+        {
+            "name": "AtolCD",
+            "email": "magento@atolcd.com"
+        }
+    ],
     "suggest": {
-        "magento-hackathon/magento-composer-installer": "*"
-    }
+        "magento-hackathon\/magento-composer-installer": "*"
+    },
+    "keywords": [
+        "openmage-module"
+    ]
 }
